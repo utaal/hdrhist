@@ -1,0 +1,9 @@
+[package]
+name = "hdrhist"
+version = "0.1.0"
+authors = ["Andrea Lattuada <andrea.lattuada@inf.ethz.ch>"]
+
+[dependencies]
+
+[dev-dependencies]
+rand = "*"
