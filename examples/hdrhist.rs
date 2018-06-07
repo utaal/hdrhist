@@ -1,13 +1,10 @@
 extern crate hdrhist;
 extern crate rand;
 
-use rand::Rng;
-use rand::RngCore;
-
-use rand::distributions::{Normal, Poisson, Distribution};
+use rand::distributions::{Normal, Distribution};
 
 fn main() {
-    let normal = Normal::new(10.0, 3.0);
+    let normal = Normal::new(20.0, 3.0);
     let mut rng = rand::thread_rng();
 
     let mut hist = hdrhist::HDRHist::new();
@@ -22,4 +19,7 @@ fn main() {
     for (v, p, c) in hist.ccdf() {
         println!("{}\t{}\t{}", v, p, c);
     }
+
+    eprintln!("summary {:#?}", hist.summary().collect::<Vec<_>>());
+    eprintln!("summary_string\n{}", hist.summary_string());
 }

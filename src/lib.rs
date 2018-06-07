@@ -54,4 +54,51 @@ impl HDRHist {
             (value, fraction, *count)
         })
     }
+
+    /// Output a summary of the samples' cdf as (quantile, value) pairs
+    ///
+    /// Quantiles are estimated
+    pub fn summary<'a>(&'a self) -> impl Iterator<Item=(f64, u64)>+'a {
+        let mut ccdf = self.ccdf();
+        [0.75, 0.50, 0.25, 0.05, 0.01, 0.001, 0.0].into_iter().map(move |p| {
+            let (value, _, _) = if *p == 0.0 {
+                ccdf.by_ref().last().expect("invalid ccdf")
+            } else {
+                ccdf.by_ref().find(|&(_, fraction, _)| fraction <= *p).expect("invalid ccdf")
+            };
+            (1f64 - p, value)
+        })
+    }
+
+    /// Output a summary of the samples' cdf as (quantile, value) pairs
+    ///
+    /// Quantiles are estimated
+    pub fn summary_string(&self) -> String {
+        let mut values: Vec<String> = vec!["╭ ".to_string()];
+        let mut points: Vec<String> = vec!["╰ ".to_string()];
+        for (p, v) in self.summary() {
+            if p == 0.25 {
+                points.push("[".to_string());
+            } else if p == 0.95 {
+                points.push("]".to_string());
+            } else if p < 0.95 {
+                points.push(" ".to_string());
+            } else {
+                points.push("-".to_string());
+            }
+            values.push(" ".to_string());
+            if p < 0.95 {
+                points.push(format!("    {:<5}    ", p));
+            } else if p != 1.0 {
+                points.push(format!("--- {:<5} ---", p));
+            } else {
+                points.push("---| max     ".to_string());
+            }
+            values.push(format!(" {:^11.6e} ", v as f64));
+        }
+        values.push("╮\n".to_string());
+        values.extend(points.into_iter());
+        values.push("╯".to_string());
+        values.join("")
+    }
 }
