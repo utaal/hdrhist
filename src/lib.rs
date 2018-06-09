@@ -12,6 +12,15 @@ impl HDRHist {
         let low_bits = value >> (index.saturating_sub(1)) & ((1 << HDHISTOGRAM_BITS) - 1);
         self.counts[index][low_bits as usize] += 1;
     }
+
+    pub fn combined(mut self, other: Self) -> Self {
+        for (bs, bo) in self.counts.iter_mut().zip(other.counts.iter()).flat_map(
+            |(ss, os)| ss.iter_mut().zip(os.iter())) {
+
+            *bs += bo;
+        }
+        self
+    }
 }
 
 impl HDRHist {
