@@ -1,4 +1,4 @@
-extern crate hdrhist;
+extern crate streaming_harness_hdrhist;
 extern crate rand;
 extern crate textplots;
 
@@ -8,7 +8,7 @@ fn main() {
     let normal = Normal::new(20.0, 3.0);
     let mut rng = rand::thread_rng();
 
-    let mut hist = hdrhist::HDRHist::new();
+    let mut hist = streaming_harness_hdrhist::HDRHist::new();
 
     for _ in 0..1000000000 {
         let val = normal.sample(&mut rng) * 1_000_000_000f64;
@@ -30,7 +30,7 @@ fn main() {
     let interpolated = textplots::utils::interpolate(&data[..]);
     Chart::new(180, 60, 0.0, 8e10).lineplot(interpolated).display();
 
-    let mut hist2 = hdrhist::HDRHist::new();
+    let mut hist2 = streaming_harness_hdrhist::HDRHist::new();
     for _ in 0..1000000000 {
         hist2.add_value(1000000);
     }
