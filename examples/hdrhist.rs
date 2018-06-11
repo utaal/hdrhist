@@ -22,4 +22,10 @@ fn main() {
 
     eprintln!("summary {:#?}", hist.summary().collect::<Vec<_>>());
     eprintln!("summary_string\n{}", hist.summary_string());
+
+    let mut hist2 = hdrhist::HDRHist::new();
+    for _ in 0..1000000000 {
+        hist2.add_value(1000000);
+    }
+    eprintln!("summary_string\n{}", hist2.summary_string());
 }

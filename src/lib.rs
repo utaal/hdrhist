@@ -69,13 +69,21 @@ impl HDRHist {
     /// Quantiles are estimated
     pub fn summary<'a>(&'a self) -> impl Iterator<Item=(f64, u64)>+'a {
         let mut ccdf = self.ccdf();
+        let mut prev = (1.0, 0);
         [0.75, 0.50, 0.25, 0.05, 0.01, 0.001, 0.0].into_iter().map(move |p| {
-            let (value, _, _) = if *p == 0.0 {
-                ccdf.by_ref().last().expect("invalid ccdf")
+            let (prev_f, prev_v) = prev;
+            if prev_f <= *p {
+                (1f64 - p, prev_v)
             } else {
-                ccdf.by_ref().find(|&(_, fraction, _)| fraction <= *p).expect("invalid ccdf")
-            };
-            (1f64 - p, value)
+                if *p == 0.0 {
+                    prev = ccdf.by_ref().last().map(|(v, f, _)| (f, v)).unwrap_or(prev);
+                } else {
+                    prev = ccdf.by_ref().find(|&(_, fraction, _)| fraction <= *p)
+                        .map(|(v, f, _)| (f, v)).unwrap_or(prev);
+                }
+                let (_, value) = prev;
+                (1f64 - p, value)
+            }
         })
     }
 
