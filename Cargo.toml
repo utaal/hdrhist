@@ -7,3 +7,4 @@ authors = ["Andrea Lattuada <andrea.lattuada@inf.ethz.ch>"]
 
 [dev-dependencies]
 rand = "*"
+textplots = "^0.2"
