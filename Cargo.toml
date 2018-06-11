@@ -3,8 +3,11 @@ name = "streaming-harness-hdrhist"
 version = "0.2.0"
 authors = ["Andrea Lattuada <andrea.lattuada@inf.ethz.ch>"]
 
+description = "Minimal hdr histogram (https://hdrhistogram.github.io/HdrHistogram/) implementation in rust"
+license = "MIT"
+
 [dependencies]
 
 [dev-dependencies]
-rand = "*"
+rand = "^0.5"
 textplots = "^0.2"
