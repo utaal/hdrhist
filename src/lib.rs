@@ -40,18 +40,19 @@ impl HDRHist {
         let flattened = self.counts.iter().enumerate().flat_map(move |(index, bucket)| {
             bucket.iter().enumerate().map(move |(sub, count)| (index, sub, count))
         });
-        let (first, _) = flattened.clone().enumerate().find(|&(_, (_, _, c))| *c > 0).expect("no values in histogram");
-        let last = flattened.clone().enumerate().fold(0, |acc, (i, (_, _, c))| {
-            if *c > 0 {
-                i
-            } else {
-                acc
-            }
-        });
+        let (first, last, total) = if let Some((first, _)) = flattened.clone().enumerate().find(|&(_, (_, _, c))| *c > 0) {
+            let last = flattened.clone().enumerate().fold(0, |acc, (i, (_, _, c))| {
+                if *c > 0 {
+                    i
+                } else {
+                    acc
+                }
+            });
+            let total: u64 = self.counts.iter().map(|x| x.iter().sum::<u64>()).sum();
+            (first, last, total)
+        } else { (2, 0, 0) };
 
-        let total: u64 = self.counts.iter().map(|x| x.iter().sum::<u64>()).sum();
         let mut sum: u64 = 0;
-
         flattened.take(last + 2).skip(first).map(move |(index, sub, count)| {
             let value = if index > 0 {
                 (1u64 << (index + HDHISTOGRAM_BITS - 1)).saturating_add((sub as u64 + 1) << (index - 1))
@@ -117,5 +118,16 @@ impl HDRHist {
         values.extend(points.into_iter());
         values.push("╯".to_string());
         values.join("")
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn no_panic_on_empty_hist() {
+        let mut hist = ::HDRHist::new();
+        assert_eq!(hist.ccdf().next(), None);
+        assert_eq!(hist.summary().last(), Some((1.0, 0)));
+        assert!(hist.summary_string().len() > 0);
     }
 }
