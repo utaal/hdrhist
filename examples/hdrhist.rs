@@ -21,10 +21,9 @@ fn main() {
     eprintln!("summary_string\n{}", hist.summary_string());
 
     eprintln!("plot"); 
-    use textplots::{Chart, Plot};
+    use textplots::{Chart, Plot, Shape};
     let data: Vec<_> = hist.ccdf().map(|(v, p, _)| (v as f32, p as f32)).collect();
-    let interpolated = textplots::utils::interpolate(&data[..]);
-    Chart::new(180, 60, 0.0, 8e10).lineplot(interpolated).display();
+    Chart::new(180, 60, 0.0, 8e10).lineplot(Shape::Lines(&data)).nice();
 
     let mut hist2 = hdrhist::HDRHist::new();
     for _ in 0..1000000000 {
