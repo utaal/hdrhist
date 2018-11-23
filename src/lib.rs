@@ -34,8 +34,8 @@ impl HDRHist {
     /// Output the complementary cumulative distribution function (ccdf) of the samples
     /// 
     /// Returns an iterator over increasing sample values such that, for every triple
-    /// `(value, prob, count)`, `prob` is the ratio of samples >= `value`, and
-    /// `count` is the nubmer of samples >= the previous `value` and < the current `value`.
+    /// `(value, prob, count)`, `prob` is the ratio of samples >= previous `value`, and
+    /// `count` is the number of samples >= the previous `value` and < the current `value`.
     pub fn ccdf<'a>(&'a self) -> impl Iterator<Item=(u64, f64, u64)>+'a {
         let flattened = self.counts.iter().enumerate().flat_map(move |(index, bucket)| {
             bucket.iter().enumerate().map(move |(sub, count)| (index, sub, count))
