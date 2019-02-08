@@ -5,7 +5,7 @@ extern crate textplots;
 use rand::distributions::{Normal, Distribution};
 
 fn main() {
-    let normal = Normal::new(20.0, 3.0);
+    let normal = Normal::new(20.0, 5.0);
     let mut rng = rand::thread_rng();
 
     let mut hist = streaming_harness_hdrhist::HDRHist::new();
@@ -34,5 +34,20 @@ fn main() {
     for _ in 0..1000000000 {
         hist2.add_value(1000000);
     }
+    for (v, p, c) in hist2.ccdf() {
+        println!("{}\t{}\t{}", v, p, c);
+    }
     eprintln!("summary_string\n{}", hist2.summary_string());
+
+    let mut hist3 = streaming_harness_hdrhist::HDRHist::new();
+    for x in 1024..2049 { hist3.add_value(x); }
+    for (v, p, c) in hist3.ccdf() {
+        println!("{}\t{}\t{}", v, p, c);
+    }
+    for (v, p) in hist3.ccdf_upper_bound() {
+        println!("{}\t{}", v, p);
+    }
+    for (v, p) in hist3.ccdf_lower_bound() {
+        println!("{}\t{}", v, p);
+    }
 }
