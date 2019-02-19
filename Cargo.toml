@@ -4,7 +4,7 @@ version = "0.3.1-pre"
 authors = ["Andrea Lattuada <andrea.lattuada@inf.ethz.ch>"]
 edition = "2018"
 
-description = "Minimal hdr histogram (https://hdrhistogram.github.io/HdrHistogram/) implementation in rust"
+description = "Deprecated in favour of https://crates.io/crates/hdrhist"
 license = "MIT"
 
 [dependencies]
