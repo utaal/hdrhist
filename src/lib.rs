@@ -1,6 +1,6 @@
 //! `hdrhist` is a small footprint [hdr histogram](https://hdrhistogram.github.io/HdrHistogram/).
 //!
-//! It collects `u64` values in the full `u64` value range with precision of 5 most significant bits. You can add new samples in `O(1)` time (a handful of cycles), and it will never reallocate.
+//! It collects `u64` samples in the full `u64` value range with precision of 5 most significant bits. You can add new samples in `O(1)` time (a handful of cycles), and it will never reallocate.
 
 #![deny(missing_docs)]
 
