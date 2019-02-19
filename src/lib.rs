@@ -6,7 +6,7 @@
 
 const HDHISTOGRAM_BITS: usize = 4;
 
-/// An hdr histogram that collects `u64` sample with 5 bit precision.
+/// An hdr histogram that collects `u64` samples with 5 bit precision.
 #[derive(Clone)]
 pub struct HDRHist {
     counts: [[u64; 1 << HDHISTOGRAM_BITS]; 64 - HDHISTOGRAM_BITS + 1],
