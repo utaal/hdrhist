@@ -1,10 +1,13 @@
 [package]
-name = "streaming-harness-hdrhist"
+name = "hdrhist"
 version = "0.4.1-pre"
 authors = ["Andrea Lattuada <andrea.lattuada@inf.ethz.ch>"]
+repository = "https://github.com/utaal/hdrhist"
+documentation = "https://docs.rs/hdrhist"
+
 edition = "2018"
 
-description = "Deprecated in favour of https://crates.io/crates/hdrhist"
+description = "Small footprint hdr histogram"
 license = "MIT"
 
 [dependencies]

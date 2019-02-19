@@ -1,11 +1,28 @@
+//! `hdrhist` is a small footprint [hdr histogram](https://hdrhistogram.github.io/HdrHistogram/).
+//!
+//! It collects `u64` values in the full `u64` value range with precision of 5 most significant bits. You can add new samples in `O(1)` time (a handful of cycles), and it will never reallocate.
+
+#![deny(missing_docs)]
+
 const HDHISTOGRAM_BITS: usize = 4;
 
-#[derive(Clone, Debug)]
+/// An hdr histogram that collects `u64` sample with 5 bit precision.
+#[derive(Clone)]
 pub struct HDRHist {
-    counts: Vec<[u64; 1 << HDHISTOGRAM_BITS]>,
+    counts: [[u64; 1 << HDHISTOGRAM_BITS]; 64 - HDHISTOGRAM_BITS + 1],
 }
 
 impl HDRHist {
+    /// Construct an empty hdr histogram.
+    pub fn new() -> Self {
+        HDRHist {
+            counts: [[0u64; 1 << HDHISTOGRAM_BITS]; 64 - HDHISTOGRAM_BITS + 1],
+        }
+    }
+
+    /// Add a sample to the histogram.
+    ///
+    /// This is guaranteed to be constant time and never re-allocates.
     pub fn add_value(&mut self, value: u64) {
         let msb: usize = 64usize - value.leading_zeros() as usize;
         let index = msb.saturating_sub(HDHISTOGRAM_BITS);
@@ -13,6 +30,8 @@ impl HDRHist {
         self.counts[index][low_bits as usize] += 1;
     }
 
+    /// Combine this histogram with another. This doesn't normalize, and only adds the per-bucket
+    /// counts. Only use it for histograms that have captured a comparable number of samples.
     pub fn combined(mut self, other: Self) -> Self {
         for (bs, bo) in self.counts.iter_mut().zip(other.counts.iter()).flat_map(
             |(ss, os)| ss.iter_mut().zip(os.iter())) {
@@ -20,15 +39,6 @@ impl HDRHist {
             *bs += bo;
         }
         self
-    }
-}
-
-impl HDRHist {
-    /// New HDRHist
-    pub fn new() -> Self {
-        HDRHist {
-            counts: vec![[0u64; 1 << HDHISTOGRAM_BITS]; 64 - HDHISTOGRAM_BITS + 1],
-        }
     }
 
     /// Output the complementary cumulative distribution function (ccdf) of the samples
@@ -65,6 +75,11 @@ impl HDRHist {
         })
     }
 
+    /// Outputs an upper bound of the complementary cumulative distribution function (ccdf) of the samples.
+    ///
+    /// You can use these points to plot with linear interpolation and never report intermediate
+    /// sample values that underestimate quantiles. In other words, all the actual quantile values will be below the
+    /// reported curve.
     pub fn ccdf_upper_bound<'a>(&'a self) -> impl Iterator<Item=(u64, f64)>+'a {
         let mut ccdf = self.ccdf();
         let mut cur_f = ccdf.next().map(|(_, f, _)| f);
@@ -75,6 +90,11 @@ impl HDRHist {
         })
     }
 
+    /// Outputs an upper bound of the complementary cumulative distribution function (ccdf) of the samples.
+    ///
+    /// You can use these points to plot with linear interpolation and never report intermediate
+    /// sample values that overestimate quantiles. In other words, all the actual quantile values will be above the
+    /// reported curve.
     pub fn ccdf_lower_bound<'a>(&'a self) -> impl Iterator<Item=(u64, f64)>+'a {
         let mut ccdf = self.ccdf();
         let mut cur_v = ccdf.next().map(|(v, _, _)| v);
