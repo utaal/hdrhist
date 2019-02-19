@@ -1,6 +1,6 @@
 [package]
 name = "hdrhist"
-version = "0.5.0"
+version = "0.5.1-pre"
 authors = ["Andrea Lattuada <andrea.lattuada@inf.ethz.ch>"]
 repository = "https://github.com/utaal/hdrhist"
 documentation = "https://docs.rs/hdrhist"
